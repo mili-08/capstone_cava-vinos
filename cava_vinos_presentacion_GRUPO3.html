@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyecto Capstone — Cava de Vinos</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@100;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --wine: #6B1A2A;
+    --wine-dark: #3D0D17;
+    --wine-light: #9B3045;
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --cream: #F5EFE0;
+    --parchment: #EDE4CC;
+    --ink: #1A1008;
+    --mist: #8B7D6B;
+    --bg: #0E0608;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    font-size: 112%;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--cream);
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    padding: 4rem 2rem;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 100%, rgba(107,26,42,0.5) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 20% 20%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      var(--bg);
+  }
+
+  .hero-ornament {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 1s 0.2s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--cream);
+    margin: 1.5rem 0 0.5rem;
+    opacity: 0;
+    animation: fadeUp 1s 0.4s forwards;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  .hero-subtitle {
+    font-size: 0.75rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--mist);
+    margin-top: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 1s 0.6s forwards;
+  }
+
+  .hero-divider {
+    width: 1px;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    margin: 3rem auto;
+    opacity: 0;
+    animation: fadeUp 1s 0.8s forwards;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 3rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--mist);
+    opacity: 0;
+    animation: fadeUp 1s 1s forwards;
+  }
+
+  .hero-meta span { color: var(--gold); }
+
+  .hero-team {
+    margin-top: 1.2rem;
+    font-size: 0.92rem;
+    letter-spacing: 0.12em;
+    color: rgba(245,239,224,0.78);
+    opacity: 0;
+    animation: fadeUp 1s 1.2s forwards;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(14,6,8,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    padding: 0 2rem;
+  }
+
+  nav ul {
+    display: flex;
+    list-style: none;
+    justify-content: center;
+    gap: 0;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  nav a {
+    display: block;
+    padding: 1.1rem 1.4rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--mist);
+    text-decoration: none;
+    transition: color 0.3s;
+    position: relative;
+  }
+
+  nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%; right: 50%;
+    height: 1px;
+    background: var(--gold);
+    transition: left 0.3s, right 0.3s;
+  }
+
+  nav a:hover { color: var(--gold); }
+  nav a:hover::after { left: 1rem; right: 1rem; }
+
+  /* ── SECTIONS ── */
+  section {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 6rem 2rem;
+  }
+
+  .section-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.4;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 300;
+    line-height: 1.2;
+    color: var(--cream);
+    margin-bottom: 2.5rem;
+  }
+
+  .section-title em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  p {
+    font-size: 0.88rem;
+    line-height: 1.9;
+    color: rgba(245,239,224,0.75);
+    margin-bottom: 1.2rem;
+    max-width: 680px;
+  }
+
+  /* ── PROBLEM CARDS ── */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1px;
+    margin-top: 3rem;
+    border: 1px solid rgba(201,168,76,0.1);
+  }
+
+  .problem-card {
+    padding: 2rem;
+    background: rgba(255,255,255,0.02);
+    border-right: 1px solid rgba(201,168,76,0.08);
+    transition: background 0.3s;
+  }
+
+  .problem-card:hover { background: rgba(107,26,42,0.15); }
+
+  .problem-card .icon {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .problem-card h4 {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.6rem;
+  }
+
+  .problem-card p {
+    font-size: 0.82rem;
+    margin: 0;
+  }
+
+  /* ── OBJECTIVES ── */
+  .obj-list {
+    list-style: none;
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .obj-list li {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 1.5rem;
+    align-items: start;
+    padding: 1.4rem 0;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+    font-size: 0.86rem;
+    color: rgba(245,239,224,0.8);
+    line-height: 1.7;
+  }
+
+  .obj-list li .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-style: italic;
+    color: var(--wine-light);
+    line-height: 1;
+    padding-top: 0.1rem;
+  }
+
+  /* ── REQUIREMENTS TABLE ── */
+  .req-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2.5rem;
+    font-size: 0.8rem;
+  }
+
+  .req-table thead tr {
+    border-bottom: 1px solid var(--gold);
+  }
+
+  .req-table th {
+    text-align: left;
+    padding: 0.8rem 1rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  .req-table td {
+    padding: 0.9rem 1rem;
+    color: rgba(245,239,224,0.75);
+    border-bottom: 1px solid rgba(201,168,76,0.07);
+    line-height: 1.6;
+    vertical-align: top;
+  }
+
+  .req-table tr:hover td { background: rgba(107,26,42,0.1); }
+
+  .req-table td:first-child {
+    color: var(--gold);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 2px;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    margin-right: 0.3rem;
+    margin-bottom: 0.2rem;
+  }
+
+  /* ── ENTITIES ── */
+  .entity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1px;
+    margin-top: 2.5rem;
+    border: 1px solid rgba(201,168,76,0.1);
+  }
+
+  .entity-card {
+    padding: 1.8rem;
+    background: rgba(255,255,255,0.015);
+    border-right: 1px solid rgba(201,168,76,0.06);
+    border-bottom: 1px solid rgba(201,168,76,0.06);
+    position: relative;
+    transition: background 0.3s;
+  }
+
+  .entity-card:hover { background: rgba(107,26,42,0.12); }
+
+  .entity-card.weak {
+    border-left: 2px solid var(--wine-light);
+  }
+
+  .entity-type {
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--mist);
+    margin-bottom: 0.4rem;
+  }
+
+  .entity-type.weak-label { color: var(--wine-light); }
+
+  .entity-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--cream);
+    margin-bottom: 0.8rem;
+  }
+
+  .entity-attrs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .attr-tag {
+    font-size: 0.62rem;
+    letter-spacing: 0.05em;
+    padding: 0.2rem 0.5rem;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.04);
+    color: rgba(245,239,224,0.6);
+  }
+
+  .attr-tag.pk {
+    background: rgba(201,168,76,0.12);
+    color: var(--gold);
+    border: 1px solid rgba(201,168,76,0.2);
+    text-decoration: underline;
+  }
+
+  .attr-tag.derived {
+    background: rgba(107,26,42,0.2);
+    color: var(--wine-light);
+    border: 1px dashed rgba(107,26,42,0.4);
+  }
+
+  .attr-tag.multi {
+    background: rgba(255,255,255,0.06);
+    color: var(--cream);
+    border: 1px double rgba(245,239,224,0.2);
+  }
+
+  .attr-tag.comp {
+    background: rgba(139,125,107,0.15);
+    color: var(--mist);
+    border: 1px solid rgba(139,125,107,0.2);
+  }
+
+  /* ── RELATIONS ── */
+  .rel-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2.5rem;
+    font-size: 0.8rem;
+  }
+
+  .rel-table thead tr { border-bottom: 1px solid var(--gold); }
+
+  .rel-table th {
+    padding: 0.8rem 1rem;
+    text-align: left;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  .rel-table td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid rgba(201,168,76,0.07);
+    color: rgba(245,239,224,0.75);
+    vertical-align: middle;
+    line-height: 1.5;
+  }
+
+  .rel-table tr:hover td { background: rgba(107,26,42,0.1); }
+
+  .cardinality {
+    display: inline-block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    font-style: italic;
+    color: var(--gold-light);
+    min-width: 3rem;
+  }
+
+  /* ── ASSUMPTIONS ── */
+  .assumption-list {
+    list-style: none;
+    margin-top: 2rem;
+  }
+
+  .assumption-list li {
+    padding: 1rem 0 1rem 2rem;
+    border-bottom: 1px solid rgba(201,168,76,0.07);
+    font-size: 0.85rem;
+    color: rgba(245,239,224,0.75);
+    line-height: 1.7;
+    position: relative;
+  }
+
+  .assumption-list li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  /* ── NF REQUIREMENTS ── */
+  .nf-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+
+  .nf-card {
+    padding: 1.8rem;
+    border: 1px solid rgba(201,168,76,0.12);
+    background: rgba(255,255,255,0.015);
+    transition: border-color 0.3s, background 0.3s;
+  }
+
+  .nf-card:hover {
+    border-color: rgba(201,168,76,0.3);
+    background: rgba(107,26,42,0.1);
+  }
+
+  .nf-card .nf-id {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    margin-bottom: 0.6rem;
+  }
+
+  .nf-card h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    color: var(--cream);
+    margin-bottom: 0.6rem;
+  }
+
+  .nf-card p { font-size: 0.8rem; margin: 0; }
+
+  /* ── DIAGRAM PLACEHOLDER ── */
+  .diagram-wrap {
+    margin-top: 3rem;
+    border: 1px solid rgba(201,168,76,0.15);
+    background: rgba(255,255,255,0.015);
+    padding: 3rem;
+    text-align: center;
+  }
+
+  .diagram-wrap .fig-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--mist);
+    margin-top: 1.5rem;
+  }
+
+  .diagram-placeholder {
+    width: 100%;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed rgba(201,168,76,0.2);
+    color: var(--mist);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  /* ── SEPARATOR ── */
+  .sep {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(201,168,76,0.2), transparent);
+    margin: 0 auto;
+    max-width: 960px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 4rem 2rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--mist);
+    border-top: 1px solid rgba(201,168,76,0.08);
+  }
+
+  footer .wine-mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-style: italic;
+    color: var(--wine-light);
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--wine); }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-ornament">Proyecto Capstone · Base de Datos</div>
+  <h1 class="hero-title">Sistema de Gestión<br><em>Cava de Vinos</em></h1>
+  <p class="hero-subtitle">Modelo Entidad–Relación · Análisis de Requisitos</p>
+  <div class="hero-divider"></div>
+  <div class="hero-meta">
+    <div>Tipo <span>Grupal</span></div>
+    <div>Entidades <span>13+</span></div>
+    <div>Herramienta <span>Draw.io</span></div>
+  </div>
+  <div class="hero-team reveal">Grupo 3: Daniel Angulo, Isais Avalos, Milagro Martinez y Maxi Garcia</div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <ul>
+    <li><a href="#descripcion">Negocio</a></li>
+    <li><a href="#problema">Problema</a></li>
+    <li><a href="#objetivos">Objetivos</a></li>
+    <li><a href="#rf">Req. Funcionales</a></li>
+    <li><a href="#rnf">Req. No Funcionales</a></li>
+    <li><a href="#entidades">Entidades</a></li>
+    <li><a href="#relaciones">Relaciones</a></li>
+    <li><a href="#supuestos">Supuestos</a></li>
+    <li><a href="#diagrama">Diagrama</a></li>
+  </ul>
+</nav>
+
+<!-- 1. DESCRIPCIÓN DEL NEGOCIO -->
+<section id="descripcion">
+  <div class="section-label reveal">01 · Descripción</div>
+  <h2 class="section-title reveal">El <em>negocio</em></h2>
+  <p class="reveal">La cava de vinos es un establecimiento especializado que adquiere vinos de distintas procedencias nacionales e internacionales, los almacena bajo condiciones controladas de temperatura y humedad, y los comercializa tanto a clientes particulares como a restaurantes y distribuidores.</p>
+  <p class="reveal">Cuenta con personal especializado —sommeliers— capaces de evaluar y recomendar vinos según el perfil del cliente. El negocio opera con múltiples cavas y gestiona tanto el proceso de compra a proveedores como el de venta a clientes, incluyendo sugerencias de maridaje basadas en criterios gastronómicos.</p>
+</section>
+
+<div class="sep"></div>
+
+<!-- 2. PROBLEMÁTICA -->
+<section id="problema">
+  <div class="section-label reveal">02 · Problemática</div>
+  <h2 class="section-title reveal">¿Por qué se necesita<br><em>este sistema?</em></h2>
+  <p class="reveal">Actualmente la cava no cuenta con un sistema centralizado de información, lo que genera los siguientes problemas operativos:</p>
+
+  <div class="problem-grid reveal">
+    <div class="problem-card">
+      <div class="icon">📦</div>
+      <h4>Inventario</h4>
+      <p>El inventario se maneja de forma manual, generando desactualizaciones frecuentes y pérdidas de stock no registradas.</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">🧾</div>
+      <h4>Compras</h4>
+      <p>No existe un registro formal de las compras realizadas a proveedores ni trazabilidad de las botellas adquiridas.</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">🛒</div>
+      <h4>Ventas</h4>
+      <p>Las ventas no quedan asociadas a clientes ni empleados, impidiendo consultar el historial comercial.</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">📝</div>
+      <h4>Evaluaciones</h4>
+      <p>Las evaluaciones de los sommeliers se pierden o no están disponibles para el resto del equipo.</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">🍽️</div>
+      <h4>Maridaje</h4>
+      <p>Las recomendaciones de maridaje dependen exclusivamente de la memoria del personal, sin respaldo en datos.</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">📍</div>
+      <h4>Ubicación</h4>
+      <p>No hay trazabilidad de cada botella dentro de la cava ni control de las condiciones de almacenamiento.</p>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- 3. OBJETIVOS -->
+<section id="objetivos">
+  <div class="section-label reveal">03 · Objetivos</div>
+  <h2 class="section-title reveal">Lo que el sistema<br><em>debe lograr</em></h2>
+
+  <ul class="obj-list">
+    <li class="reveal"><span class="num">1</span>Centralizar toda la información relacionada con vinos y varietales en una única base de datos relacional.</li>
+    <li class="reveal"><span class="num">2</span>Gestionar el stock con ubicación precisa de cada botella dentro de cada cava, incluyendo condiciones de almacenaje.</li>
+    <li class="reveal"><span class="num">3</span>Registrar y consultar el historial completo de compras a proveedores y ventas a clientes.</li>
+    <li class="reveal"><span class="num">4</span>Asociar evaluaciones de sommeliers a cada vino con criterios de puntuación, aroma, sabor y retrogusto.</li>
+    <li class="reveal"><span class="num">5</span>Ofrecer recomendaciones de maridaje basadas en datos almacenados y categorías gastronómicas.</li>
+    <li class="reveal"><span class="num">6</span>Facilitar la toma de decisiones comerciales mediante consultas estructuradas sobre el catálogo y el desempeño de ventas.</li>
+  </ul>
+</section>
+
+<div class="sep"></div>
+
+<!-- 4. REQUISITOS FUNCIONALES -->
+<section id="rf">
+  <div class="section-label reveal">04 · Requisitos Funcionales</div>
+  <h2 class="section-title reveal">Qué debe <em>hacer</em><br>el sistema</h2>
+
+  <table class="req-table reveal">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>RF01</td><td>Gestión de vinos</td><td>Registrar cada vino con nombre, tipo, varietal, año de cosecha, graduación alcohólica, descripción y notas de cata.</td></tr>
+      <tr><td>RF02</td><td>Gestión de varietales</td><td>Registrar el varietal de cada vino con tipo de uva, color, nivel de tanino y graduación promedio.</td></tr>
+      <tr><td>RF03</td><td>Gestión de proveedores</td><td>Registrar proveedores con datos completos incluyendo múltiples teléfonos, correos y dirección detallada.</td></tr>
+      <tr><td>RF04</td><td>Gestión de compras</td><td>Registrar cada compra asociada a un proveedor con fecha, método de pago, estado y detalle de vinos adquiridos.</td></tr>
+      <tr><td>RF05</td><td>Gestión de stock</td><td>Controlar el stock de cada vino mediante botellas con ubicación precisa dentro de la cava.</td></tr>
+      <tr><td>RF06</td><td>Gestión de cavas</td><td>Registrar cada cava con capacidad total, temperatura ideal, humedad ideal y tipo de almacenaje.</td></tr>
+      <tr><td>RF07</td><td>Gestión de ubicaciones</td><td>Asignar a cada botella una ubicación específica mediante fila, columna, nivel y sector dentro de la cava.</td></tr>
+      <tr><td>RF08</td><td>Gestión de clientes</td><td>Registrar clientes con datos personales completos incluyendo múltiples medios de contacto.</td></tr>
+      <tr><td>RF09</td><td>Gestión de ventas</td><td>Registrar cada venta asociada a un cliente con fecha, método de pago, estado y detalle de vinos vendidos.</td></tr>
+      <tr><td>RF10</td><td>Historial de ventas</td><td>Consultar todas las ventas realizadas por un cliente determinado en cualquier período.</td></tr>
+      <tr><td>RF11</td><td>Gestión de sommeliers</td><td>Registrar el personal especializado con sus datos y años de experiencia.</td></tr>
+      <tr><td>RF12</td><td>Evaluaciones de vinos</td><td>Registrar evaluaciones de sommeliers sobre cada vino con puntuación, aroma, sabor, retrogusto y observaciones.</td></tr>
+      <tr><td>RF13</td><td>Maridaje</td><td>Registrar sugerencias de maridaje para cada vino asociadas a categorías de alimentos con temperatura de servicio y nivel de recomendación.</td></tr>
+      <tr><td>RF14</td><td>Categorías de alimentos</td><td>Clasificar alimentos por tipo, nivel de intensidad y origen gastronómico para estructurar las recomendaciones de maridaje.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<div class="sep"></div>
+
+<!-- 5. REQUISITOS NO FUNCIONALES -->
+<section id="rnf">
+  <div class="section-label reveal">05 · Requisitos No Funcionales</div>
+  <h2 class="section-title reveal">Cómo debe <em>comportarse</em><br>el sistema</h2>
+
+  <div class="nf-grid">
+    <div class="nf-card reveal">
+      <div class="nf-id">RNF01</div>
+      <h4>Integridad</h4>
+      <p>No deben existir ventas sin cliente ni compras sin proveedor asociado.</p>
+    </div>
+    <div class="nf-card reveal">
+      <div class="nf-id">RNF02</div>
+      <h4>Consistencia</h4>
+      <p>Los atributos derivados como total y subtotal siempre deben calcularse desde los datos base, nunca almacenarse como valor fijo.</p>
+    </div>
+    <div class="nf-card reveal">
+      <div class="nf-id">RNF03</div>
+      <h4>Escalabilidad</h4>
+      <p>El modelo debe permitir agregar nuevas cavas y varietales sin modificar la estructura existente.</p>
+    </div>
+    <div class="nf-card reveal">
+      <div class="nf-id">RNF04</div>
+      <h4>Trazabilidad</h4>
+      <p>Debe ser posible rastrear cada botella desde su compra al proveedor hasta su venta al cliente final.</p>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- 6. ENTIDADES -->
+<section id="entidades">
+  <div class="section-label reveal">06 · Entidades</div>
+  <h2 class="section-title reveal">Estructura del<br><em>modelo</em></h2>
+  <p class="reveal">El modelo cuenta con 12 entidades. Las etiquetas indican el tipo de cada atributo: <span class="attr-tag pk">PK clave</span> <span class="attr-tag derived">derivado</span> <span class="attr-tag multi">multivaluado</span> <span class="attr-tag comp">compuesto</span></p>
+
+  <div class="entity-grid reveal">
+    <div class="entity-card">
+      <div class="entity-type">Entidad fuerte</div>
+      <div class="entity-name">Vino</div>
+      <div class="entity-attrs">
+        <span class="attr-tag pk">id_vino</span>
+        <span class="attr-tag">nombre</span>
+        <span class="attr-tag">tipo</span>
+        <span class="attr-tag">descripcion</span>
+        <span class="attr-tag">fecha_cosecha</span>
+        <span class="attr-tag">graduacion_alcoholica</span>
+        <span class="attr-tag derived">antiguedad</span>
+        <span class="attr-tag multi">notas_catas</span>
+      </div>
+    </div>
+    <div class="entity-card">
+      <div class="entity-type">Entidad fuerte</div>
+      <div class="entity-name">Botella</div>
+      <div class="entity-attrs">
+        <span class="attr-tag pk">id_botella</span>
+        <span class="attr-tag">precio_unitario</span>
+        <span class="attr-tag">estado</span>
+        <span class="attr-tag">volumen_ml</span>
+        <span class="attr-tag">fecha_ingreso</span>
+        <span class="attr-tag">descripcion</span>
+      </div>
+    </div>
+    <div class="entity-card">
+      <div class="entity-type">Entidad fuerte</div>
+      <div class="entity-name">Varietal</div>
+      <div class="entity-attrs">
+        <span class="attr-tag pk">id_varietal</span>
+        <span class="attr-tag">nombre</span>
+        <span class="attr-tag">tipo_uva</span>
+        <span class="attr-tag">color</span>
+        <span class="attr-tag">nivel_tanino</span>
+        <span class="attr-tag">graduacion_promedio</span>
+      </div>
+    </div>
+    <div class="entity-card">
+      <div class="entity-type">Entidad fuerte</div>
+      <div class="entity-name">Proveedor</div>
+      <div class="entity-attrs">
+        <span class="attr-tag pk">id_proveedor</span>
+        <span class="attr-tag comp">nombre_completo</span>
+        <span class="attr-tag">CUIT</span>
+        <span class="attr-tag comp">direccion</span>
+        <span class="attr-tag multi">telefonos</span>
+        <span class="attr-tag multi">correos</span>
+      </div>
+    </div>
+    <div class="entity-card">
+      <div class="entity-type">Entidad fuerte</div>
+      <div class="entity-name">Sommelier</div>
+      <div class="entity-attrs">
+        <span class="attr-tag pk">id_sommelier</span>
+        <span class="attr-tag comp">nombre_completo</span>
+        <span class="attr-tag">DNI</span>
+        <span class="attr-tag">correo</span>
+        <span class="attr-tag">telefono</span>
+        <span class="attr-tag">anios_experiencia</span>
+      </div>
+    </div>
+    <div class="entity-card">
+      <div class="entity-type">Entidad fuerte</div>
+      <div class="entity-name">Evaluacion</div>
+      <div class="entity-attrs">
+        <span class="attr-tag pk">id_evaluacion</span>
+        <span class="attr-tag">puntuacion</span>
+        <span class="attr-tag">aroma</span>
+        <span class="attr-tag">sabor</span>
+        <span class="attr-tag">retrogusto</span>
+        <span class="attr-tag">fecha_evaluacion</span>
+        <span class="attr-tag">observaciones</span>
+      </div>
+    </div>
+    <div class="entity-card">
+      <div class="entity-type">Entidad fuerte</div>
+      <div class="entity-name">Cava</div>
+      <div class="entity-attrs">
+        <span class="attr-tag pk">id_cava</span>
+        <span class="attr-tag">nombre</span>
+        <span class="attr-tag">capacidad_total</span>
+        <span class="attr-tag">tipo_almacenaje</span>
+        <span class="attr-tag">temperatura_ideal</span>
+        <span class="attr-tag">humedad_ideal</span>
+        <span class="attr-tag comp">direccion</span>
+      </div>
+    </div>
+    <div class="entity-card">
+      <div class="entity-type">Entidad fuerte</div>
+      <div class="entity-name">Cliente</div>
+      <div class="entity-attrs">
+        <span class="attr-tag pk">id_cliente</span>
+        <span class="attr-tag comp">nombre_completo</span>
+        <span class="attr-tag">DNI</span>
+        <span class="attr-tag">correo</span>
+        <span class="attr-tag multi">telefono</span>
+      </div>
+    </div>
+    <div class="entity-card">
+      <div class="entity-type">Entidad fuerte</div>
+      <div class="entity-name">Venta</div>
+      <div class="entity-attrs">
+        <span class="attr-tag pk">id_venta</span>
+        <span class="attr-tag">fecha_venta</span>
+        <span class="attr-tag">metodo_pago</span>
+        <span class="attr-tag">estado</span>
+        <span class="attr-tag derived">total</span>
+      </div>
+    </div>
+    <div class="entity-card">
+      <div class="entity-type">Entidad fuerte</div>
+      <div class="entity-name">Compra</div>
+      <div class="entity-attrs">
+        <span class="attr-tag pk">id_compra</span>
+        <span class="attr-tag">fecha_compra</span>
+        <span class="attr-tag">metodo_pago</span>
+        <span class="attr-tag">estado</span>
+        <span class="attr-tag">observaciones</span>
+        <span class="attr-tag derived">precio_total</span>
+      </div>
+    </div>
+    <div class="entity-card">
+      <div class="entity-type">Entidad fuerte</div>
+      <div class="entity-name">Maridaje</div>
+      <div class="entity-attrs">
+        <span class="attr-tag pk">id_maridaje</span>
+        <span class="attr-tag">tipo_maridaje</span>
+        <span class="attr-tag">temperatura_servicio</span>
+        <span class="attr-tag">nivel_recomendacion</span>
+        <span class="attr-tag multi">ocasiones_recomendadas</span>
+      </div>
+    </div>
+    <div class="entity-card">
+      <div class="entity-type">Entidad fuerte</div>
+      <div class="entity-name">Categoria_Alimento</div>
+      <div class="entity-attrs">
+        <span class="attr-tag pk">id_categoria</span>
+        <span class="attr-tag">nombre</span>
+        <span class="attr-tag">descripcion</span>
+        <span class="attr-tag">tipo_comida</span>
+        <span class="attr-tag">nivel_intensidad</span>
+        <span class="attr-tag">origen_gastronomico</span>
+      </div>
+    </div>
+    <div class="entity-card weak">
+      <div class="entity-type weak-label">Entidad débil</div>
+      <div class="entity-name">DetalleVenta</div>
+      <div class="entity-attrs">
+        <span class="attr-tag pk">id_venta (PK+FK)</span>
+        <span class="attr-tag pk">id_vino (PK+FK)</span>
+        <span class="attr-tag">cantidad</span>
+        <span class="attr-tag">precio_unitario</span>
+        <span class="attr-tag">descuento</span>
+        <span class="attr-tag derived">subtotal</span>
+        <span class="attr-tag">observaciones</span>
+      </div>
+    </div>
+    <div class="entity-card weak">
+      <div class="entity-type weak-label">Entidad débil</div>
+      <div class="entity-name">DetalleCompra</div>
+      <div class="entity-attrs">
+        <span class="attr-tag pk">id_compra (PK+FK)</span>
+        <span class="attr-tag pk">id_vino (PK+FK)</span>
+        <span class="attr-tag">cantidad</span>
+        <span class="attr-tag">precio_unitario</span>
+        <span class="attr-tag">descuento</span>
+        <span class="attr-tag derived">subtotal</span>
+        <span class="attr-tag">observaciones</span>
+      </div>
+    </div>
+    <div class="entity-card weak">
+      <div class="entity-type weak-label">Entidad débil</div>
+      <div class="entity-name">Ubicacion</div>
+      <div class="entity-attrs">
+        <span class="attr-tag pk">id_cava (PK+FK)</span>
+        <span class="attr-tag">fila</span>
+        <span class="attr-tag">columna</span>
+        <span class="attr-tag">nivel</span>
+        <span class="attr-tag">sector</span>
+        <span class="attr-tag">descripcion</span>
+        <span class="attr-tag">disponible</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- 7. RELACIONES -->
+<section id="relaciones">
+  <div class="section-label reveal">07 · Relaciones</div>
+  <h2 class="section-title reveal">Cómo se <em>conectan</em><br>las entidades</h2>
+
+  <table class="rel-table reveal">
+    <thead>
+      <tr>
+        <th>Relación</th>
+        <th>Entidades</th>
+        <th>Cardinalidad</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Participa</td><td>Proveedor – Compra</td><td><span class="cardinality">1:N</span></td><td>Un proveedor puede tener muchas compras asociadas</td></tr>
+      <tr><td>Incluye</td><td>Compra – DetalleCompra</td><td><span class="cardinality">1:N</span></td><td>Una compra tiene muchos detalles de productos adquiridos</td></tr>
+      <tr><td>Aparece</td><td>Vino – DetalleCompra</td><td><span class="cardinality">1:N</span></td><td>Un vino puede aparecer en muchos detalles de compra</td></tr>
+      <tr><td>Tiene</td><td>Vino – Varietal</td><td><span class="cardinality">N:M</span></td><td>Un vino puede asociarse a varios varietales y un varietal puede aplicarse a muchos vinos</td></tr>
+      <tr><td>Puede</td><td>Sommelier – Evaluacion</td><td><span class="cardinality">1:N</span></td><td>Un sommelier puede realizar muchas evaluaciones</td></tr>
+      <tr><td>Corresponde a</td><td>Evaluacion – Vino</td><td><span class="cardinality">N:1</span></td><td>Un vino puede tener muchas evaluaciones</td></tr>
+      <tr><td>Corresponde a</td><td>Cliente – Venta</td><td><span class="cardinality">1:N</span></td><td>Un cliente puede realizar muchas ventas</td></tr>
+      <tr><td>Corresponde a</td><td>Venta – DetalleVenta</td><td><span class="cardinality">1:N</span></td><td>Una venta tiene muchos detalles de productos</td></tr>
+      <tr><td>Corresponde a</td><td>Vino – Botella</td><td><span class="cardinality">1:N</span></td><td>Un vino puede tener muchas botellas</td></tr>
+      <tr><td>Contiene</td><td>Cava – Ubicacion</td><td><span class="cardinality">1:N</span></td><td>Una cava puede contener muchas ubicaciones</td></tr>
+      <tr><td>Corresponde a</td><td>Ubicacion – Botella</td><td><span class="cardinality">1:N</span></td><td>Una ubicación puede contener muchas botellas</td></tr>
+      <tr><td>Puede</td><td>Botella – DetalleVenta</td><td><span class="cardinality">1:0..1</span></td><td>Una botella puede estar en cero o un detalle de venta</td></tr>
+      <tr><td>Tiene</td><td>Vino – Maridaje</td><td><span class="cardinality">1:N</span></td><td>Un vino puede tener varios maridajes</td></tr>
+      <tr><td>Asocia</td><td>Maridaje – Categoria_Alimento</td><td><span class="cardinality">1:N</span></td><td>Un maridaje se asocia a varias categorías de alimentos</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<div class="sep"></div>
+
+<!-- 8. SUPUESTOS -->
+<section id="supuestos">
+  <div class="section-label reveal">08 · Supuestos y Restricciones</div>
+  <h2 class="section-title reveal">Decisiones de<br><em>diseño</em></h2>
+
+  <ul class="assumption-list reveal">
+    <li>Un vino puede asociarse a varios varietales y un varietal puede aplicarse a muchos vinos.</li>
+    <li>Una botella pertenece a un único vino pero puede moverse entre ubicaciones dentro de la cava.</li>
+    <li>Un sommelier puede evaluar el mismo vino más de una vez en fechas distintas.</li>
+    <li>Una venta puede incluir vinos de distintas procedencias en el mismo detalle.</li>
+    <li>El precio unitario en DetalleVenta puede diferir del precio base del vino por descuentos aplicados en el momento de la transacción.</li>
+    <li>Los atributos derivados (total, subtotal, antigüedad) no se almacenan como valores fijos, sino que se calculan en consultas SQL a partir de los datos base.</li>
+    <li>Los atributos multivaluados (teléfonos, correos, notas_catas) generan tablas separadas en el modelo lógico.</li>
+    <li>Ubicacion es una entidad débil que depende de Cava para existir, con clave primaria compuesta por id_cava más el identificador de posición.</li>
+  </ul>
+</section>
+
+<div class="sep"></div>
+
+<!-- 9. DIAGRAMA -->
+<section id="diagrama">
+  <div class="section-label reveal">09 · Diagrama ER</div>
+  <h2 class="section-title reveal">Modelo Entidad–<em>Relación</em></h2>
+  <p class="reveal">Representación gráfica completa del modelo conceptual, desarrollada en Draw.io. Incluye las 12 entidades, sus atributos clasificados por tipo y todas las relaciones con sus cardinalidades.</p>
+
+  <div class="diagram-wrap reveal">
+    <div class="diagram-placeholder">
+      [ Insertar aquí el diagrama ER exportado desde Draw.io ]
+    </div>
+    <p class="fig-label">Figura 1 · Diagrama Entidad–Relación — Sistema de Gestión para Cava de Vinos</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="wine-mark">🍷</span>
+  Proyecto Capstone · Sistema de Gestión para Cava de Vinos · Base de Datos
+</footer>
+
+<script>
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
