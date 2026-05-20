@@ -2,7 +2,7 @@
 
 ## Integrantes
 - Daniel Angulo
-- Isais Avalos
+- Isaias Avalos
 - Milagro Martinez
 - Maxi Garcia
 
